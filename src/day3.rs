@@ -36,12 +36,9 @@ fn part_1(inp:String){
                                 match neighbour_char {
                                     '&' | '%' | '*' | '#' | '@' | '/' | '=' | '$' | '+' | '-' =>{
                                     adjacent = true;
+                                }, _ => {}
                                 }
-                                _ => {}
-                                }
-
                             }
-                                                   
                         }
 
                     num_s.push_str(&valid.to_string());
@@ -92,12 +89,13 @@ fn part_2(inp:String){
 
     let mut map:HashMap<(usize,usize), Vec<u32>> = HashMap::new();
 
-    let sum :u32 = lines
+        lines
         .iter()
         .enumerate()
         .map(|(r,line)| {
             let mut num_s = String::new();
             let mut adjacent = false;
+            let mut near_star:(usize,usize) = (usize::MAX,usize::MAX);
             line.chars()
                 .enumerate()
                 .filter_map(|(c,char)| {
@@ -108,14 +106,13 @@ fn part_2(inp:String){
 
                             let (n_row,n_col) = (neighbour.0 as usize, neighbour.1 as usize);
 
-                            if n_row >= 0 && n_row < line.len() && n_col >= 0 && n_col < lines.len() {
+                            if n_row < line.len() && n_col < lines.len() {
                                 
                                 let neighbour_char = lines_char[n_row][n_col];
                                 match neighbour_char {
                                     '*' => {
-                                        if map.contains_key(&(n_row,n_col)) {
-                                        }
                                         adjacent = true;
+                                        near_star = (n_row,n_col);
                                     }
                                 _ => {}
                                 }
@@ -130,8 +127,11 @@ fn part_2(inp:String){
                             if !(next_char.unwrap().is_digit(10)) {
                                 if adjacent {
                                     let num2 =  num_s.clone();
-                                    print!("{num_s}  ");
-                                    Some(num2.parse::<u32>().unwrap_or(0))
+                                    map.entry(near_star)
+                                        .or_insert_with(Vec::new)
+                                        .push(num2.parse::<u32>().unwrap_or(1));
+
+                                    Some(num2.parse::<u32>().unwrap_or(1))
                                 }
                                 else{
                                     None
@@ -140,7 +140,10 @@ fn part_2(inp:String){
                             None
                         }
                     }else if c+1 == line.len() && adjacent {
-                            Some(num_s.parse::<u32>().unwrap_or(0))
+                                        map.entry(near_star)
+                                        .or_insert_with(Vec::new)
+                                        .push(num_s.parse::<u32>().unwrap_or(1));
+                            Some(num_s.parse::<u32>().unwrap_or(1))
                         }
                         else {
                         None
@@ -154,8 +157,18 @@ fn part_2(inp:String){
             .sum::<u32>()  // Sum of numbers that matches with the condition 
 
         })
-        .sum();
-    print!("{sum:?}");
+        .sum::<u32>();
+
+    let sum2:u32 = map.iter().filter(|(_,val_v)|
+        val_v.len() > 1
+    ).map(|(_,val_v)|
+        {
+
+            val_v.iter().fold(1, |acc,&x| acc*x)
+        }
+    ).sum();
+
+    println!("{sum2}");
 
 }
 
