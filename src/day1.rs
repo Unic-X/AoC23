@@ -47,37 +47,25 @@ fn part_1(inp:String){
 fn part_2(inp:&str){
  let lines:Vec<&str> = inp.lines().collect::<Vec<&str>>();
 
-    let mut lines_:Vec<String> = vec![];
-    for line in lines {
-        let mut line2 = line.to_string();
-
-        //Shittiest way to figure out the values inside a string 
-
-        line2 = line2
+    part_1(lines.iter().map(
+        |&line| {  
+            line
             .replace("nine", "n9e")
             .replace("eight", "e8t")
-            .replace("seven", "s7n")
+            .replace("seven", "7n")
             .replace("six", "s6x")
-            .replace("five", "f5e")  
-            .replace("four", "f4r")  
+            .replace("five", "5e")  
+            .replace("four", "4r")  
             .replace("three", "t3e")
             .replace("two", "t2o")
-            .replace("one", "o1e");
-
-
-        lines_.push(line2);
-    }
-
-    part_1(lines_.iter().map(
-            |x|
-            {
-                let mut new_line = x.to_string();
-                new_line.push_str("\n");
-                new_line
-            }
-        ).collect()
-    )
-
+            .replace("one", "o1e")
+        }
+    ).map(|mut line|
+        {
+            line.push_str("\n");
+            line
+        }
+    ).collect());
 }
 
 fn main() {
