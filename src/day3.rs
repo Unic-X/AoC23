@@ -57,7 +57,7 @@ fn part_1(inp: String) -> u32{
                             None
                         }
                     } else {
-                        adjacent = false;
+                       adjacent = false;
                         num_s.clear();
                         None
                     }
@@ -67,6 +67,10 @@ fn part_1(inp: String) -> u32{
         .sum();
     return sum;
 }
+
+
+
+
 
 fn part_2(inp: String) -> u32{
     // Create Vector of strings

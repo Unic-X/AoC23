@@ -54,23 +54,15 @@ fn part_2(inp:&str){
         //Shittiest way to figure out the values inside a string 
 
         line2 = line2
-            .replace("eighthree", "83") 
-            .replace("eightwo", "82")                         
-            .replace("oneight", "18")
-            .replace("nineight", "98")
-            .replace("fiveight", "58")
-            .replace("sevenine", "79")
-            .replace("threeight", "38")
-            .replace("twone", "21")
-            .replace("nine", "9")
-            .replace("eight", "8")
-            .replace("seven", "7")
-            .replace("six", "6")
-            .replace("five", "5")  
-            .replace("four", "4")  
-            .replace("three", "3")
-            .replace("two", "2")
-            .replace("one", "1");
+            .replace("nine", "n9e")
+            .replace("eight", "e8t")
+            .replace("seven", "s7n")
+            .replace("six", "s6x")
+            .replace("five", "f5e")  
+            .replace("four", "f4r")  
+            .replace("three", "t3e")
+            .replace("two", "t2o")
+            .replace("one", "o1e");
 
 
         lines_.push(line2);
@@ -89,7 +81,7 @@ fn part_2(inp:&str){
 }
 
 fn main() {
-    let examp = fs::read_to_string("input/day_1_real.txt");
+    let examp = fs::read_to_string("input/day_1");
     match examp {
         Ok(ok) => {
             part_2(&ok);
