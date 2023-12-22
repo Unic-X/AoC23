@@ -30,7 +30,6 @@ fn part_1(inp:String)->u32{
 }
 
 
-
 fn part_2(inp:String)->u32{
 
     // Create Vector of strings
@@ -42,8 +41,7 @@ fn part_2(inp:String)->u32{
         let num = line.split(":").nth(0).unwrap().split("Card").nth(1).unwrap().trim().parse::<u32>().unwrap();
 
         let real = cards.split("|").collect::<Vec<&str>>();
-        let winning: HashSet <u32> =  HashSet::from_iter(real.iter().nth(0).unwrap().split_whitespace().map(|num_s| num_s.parse::<u32>().unwrap()));
-        
+        let winning: HashSet <u32> =  HashSet::from_iter(real.iter().nth(0).unwrap().split_whitespace().map(|num_s| num_s.parse::<u32>().unwrap())); 
         let ours : HashSet<u32> =   HashSet::from_iter(real.iter().nth(1).unwrap().split_whitespace().map(|num_s| num_s.parse::<u32>().unwrap()));
         let inter = winning.intersection(&ours).count();
         if inter>0 {

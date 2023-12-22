@@ -22,9 +22,18 @@ name ="day04"
 path = "src/day4.rs"
 
 
+[[bin]]
+name ="day05"
+path = "src/day5.rs"
+
+[[bin]]
+name ="day22"
+path = "src/day22.rs"
+
 
 
 
 [dependencies]
 
+nom = "7"
 regex = "1"
