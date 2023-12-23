@@ -55,6 +55,8 @@ impl Brick {
 trait Bricks{
     fn find_intersecting(&self,brick:&Brick)->Vec<&Brick>;
     fn intersecting(&self,brick:&Brick)->Vec<&Brick>;
+    fn above(&self,brick:&Brick)->Vec<&Brick>;
+    fn below(&self,brick:&Brick)->Vec<&Brick>;
 }
 
 impl Bricks for Vec<Brick>{
@@ -65,15 +67,34 @@ impl Bricks for Vec<Brick>{
                 b.end.x >= brick.start.x &&
                 b.start.y <= brick.end.y &&
                 b.end.y >= brick.start.y
-            }).collect::<Vec<_>>()
+            }).filter(|&b| b!=brick).collect::<Vec<_>>()
     }
 
     fn find_intersecting(&self,brick:&Brick)->Vec<&Brick>{
         self.intersecting(brick).into_iter()
             .filter(|&b| //Remove other bricks that are above the current brick
-                b!=brick && b.end.z < brick.start.z
+                b.end.z < brick.start.z
             ).collect()
     }
+
+
+    //Vec of every Brick above the desired brick
+    fn above(&self,brick:&Brick)->Vec<&Brick> {
+         self.intersecting(brick).into_iter()
+            .filter(|&b| //Remove other bricks that are above the current brick
+                b.start.z == brick.end.z + 1
+            ).collect()
+
+    }
+
+    //Vec of every Brick below the desired brick
+    fn below(&self,brick:&Brick)->Vec<&Brick> {
+         self.intersecting(brick).into_iter()
+            .filter(|&b| //Remove other bricks that are above the current brick
+                b.end.z == brick.start.z - 1
+            ).collect()
+    }
+
     
 
 }
@@ -143,6 +164,22 @@ fn part_1(inp:String){
             bricks[i].end.z = bricks[i].start.z + delta;
         }
     }
+    let removable = bricks.iter().filter(|&b| {
+                let above = bricks.above(&b);
+                above.is_empty() ||
+
+                !above.iter().any(|&b2|
+                {
+                    bricks.below(&b2)
+                        .iter()
+                        .filter(|&b3| *b3!=b)
+                        .collect::<Vec<_>>()
+                        .is_empty()
+                })
+            }
+        ).collect::<Vec<_>>();
+
+    println!("{:?}",removable.len());
 
 
 
