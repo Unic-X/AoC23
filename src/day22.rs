@@ -27,32 +27,6 @@ struct Brick{
 }
 
 
-impl Brick {
-
-    fn fall(&self,amount:usize)->Brick{
-
-        let new_start = Coordinates{
-            x:self.start.x,
-            y:self.start.y,
-            z:self.start.z.saturating_sub(amount),
-        };
-
-        let new_end = Coordinates{
-            x:self.end.x,
-            y:self.end.y,
-            z:self.end.z.saturating_sub(amount),
-
-        };
-
-        Brick {
-            start:new_start,
-            end:new_end
-        }
-        //Amount that will fall will always be in Z direction 
-    }
-
-}
-
 trait Bricks{
     fn find_intersecting(&self,brick:&Brick)->Vec<&Brick>;
     fn intersecting(&self,brick:&Brick)->Vec<&Brick>;
@@ -105,7 +79,7 @@ impl Bricks for Vec<Brick>{
         match fell.get(brick_b) {
             Some(value) => {
                 if *value==true {
-                    self.below(&brick_a)
+                    return self.below(&brick_a)
                         .iter()
                         .filter(|&b| *b!=brick_b)
                         .filter(|&b| !*fell.get(b).unwrap_or(&false)) 
@@ -121,7 +95,6 @@ impl Bricks for Vec<Brick>{
 
         }
 
-           
     }
 
     //Part 2
@@ -133,7 +106,6 @@ impl Bricks for Vec<Brick>{
 
             let mut q = VecDeque::new();
 
-
             q.push_back(start);
             let mut fell = HashMap::new();
 
@@ -142,7 +114,7 @@ impl Bricks for Vec<Brick>{
 
                 fell.insert(curr, true); 
                 if above.is_empty(){
-                    break;
+                    continue;
                 }
                 
                 for above_brick in above.into_iter(){
@@ -160,7 +132,7 @@ impl Bricks for Vec<Brick>{
             );
 
         }
-
+        all_falls.sort();
         all_falls
     }
 
@@ -215,18 +187,19 @@ fn part_1(inp:String)->(usize,Vec<Brick>){
 
         // Get the highest of them
         let highest = intersecting_bricks.iter().max_by_key(|&b| b.end.z);
+        let delta = brick.end.z - brick.start.z;
+
 
         // Check if the brick has any lower brick that is intersecting
         // if none don't change any z value
         if let Some(high_bric) = highest {
-            let amount_to_fall = brick.start.z.saturating_sub(high_bric.end.z + 1);
 
+            bricks[i].start.z = high_bric.end.z + 1;
+            bricks[i].end.z = bricks[i].start.z + delta;    
             // Update the brick in the vector
-            bricks[i] = brick.fall(amount_to_fall);
         }else{
             //If there is no other brick below the desired brick
             //Simply move the brick to the bottom 
-            let delta = brick.end.z - brick.start.z;
             bricks[i].start.z = 1;
             bricks[i].end.z = bricks[i].start.z + delta;
         }
@@ -254,15 +227,15 @@ fn part_1(inp:String)->(usize,Vec<Brick>){
 
 fn part_2(input:String)->usize{
     let (_,settled_bricks) = part_1(input);
-
+    
+    let now = time::Instant::now();
     let all_falls = settled_bricks.jenga();
 
-    let now = time::Instant::now();
 
     dbg!(&all_falls);
 
     println!("Done in ({:?})",now.elapsed());
-    println!("Length: {:?}",all_falls.len());
+
     all_falls.iter().sum()
 }   
 
