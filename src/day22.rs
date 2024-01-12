@@ -112,8 +112,8 @@ impl Bricks for Vec<Brick>{
             while let Some(curr) = q.pop_front() {
                 let above = self.above(curr);
 
-                fell.insert(curr, true); 
-                if above.is_empty(){
+                fell.insert(curr, true);  //Remove the current brick
+                if above.is_empty(){ //If there is no above brick don't look ahead go the the next brick
                     continue;
                 }
                 
