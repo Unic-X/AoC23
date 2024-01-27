@@ -1,11 +1,12 @@
 use std::{fs,ops::Add, collections::HashMap};
-
+use nom_locate::LocatedSpan;
 use nom::{multi::{separated_list1, many1}, 
     character::complete::{char,newline}, 
     IResult,
     branch::alt,
-    combinator::map,
+    combinator::map, sequence::tuple,
 };
+
 
 /*
 * Day 23
@@ -13,6 +14,8 @@ use nom::{multi::{separated_list1, many1},
 * Have no clue brain rot has begun
 */
 
+
+type Span<'a> = LocatedSpan<&'a str>;
 
 
 #[derive(Debug,Clone,Copy)]
@@ -36,6 +39,8 @@ enum Legend {
     Slope(Slope),
 }
 
+
+
 #[derive(Debug)]
 struct LegendMap{
     legend:Legend,
@@ -57,69 +62,81 @@ impl Add for Point{
         }
     }
 }
+impl Point{
+    fn new(x:usize,y:usize)->Self{
+        Point { x, y }
+    }
+}
+
+
+fn with_xy(span: &Span) -> Point {
+    let x = span.get_column();
+    let y = span.location_line() as usize;
+    Point::new(x, y)
+}
+
 
 
 //----------------Parsing stuff---------------------
 
-fn parse_forest<'a,'b>(input: &'a str,point:&'b mut Point) -> IResult<&'a str, LegendMap> {
+fn parse_forest(input: Span) -> IResult<Span, LegendMap> {
     map(char('#'), |_| LegendMap{
         legend:Legend::Forest,
-        
-        point:*point,
-
+        point:with_xy(&input)
     })(input)
+
 }
 
-fn parse_path<'a,'b>(input: &'a str,point:&'b mut Point) -> IResult<&'a str, LegendMap> {
-    map(char('.'), |_| LegendMap{
+fn parse_path(input: Span) -> IResult<Span, LegendMap> {
+    
+
+    map(char('.'), |i| LegendMap{
         legend:Legend::Path,
-        point:*point,
+        point:with_xy(&input),
     })(input)
 
 }
 
-fn parse_slope<'a,'b>(input: &'a str,point:&'b mut Point) -> IResult<&'a str, LegendMap> {
+fn parse_slope(input: Span) -> IResult<Span, LegendMap> {
     let parse_direction = alt((
         map(char('^'), |_| Slope::North),
         map(char('>'), |_| Slope::East),
         map(char('v'), |_| Slope::South),
         map(char('<'), |_| Slope::West),
     ));
+    
     map(parse_direction,|slope| LegendMap{
-        point:*point,
+        point:with_xy(&input),
         legend:Legend::Slope(slope)}
     )(input)
 
 }
 
-fn parse_map<'a>(input: &'a str, point: &mut Point) -> IResult<&'a str, Vec<LegendMap>> {
+fn parse_map(input: Span) -> IResult<Span, Vec<LegendMap>> {
     let (input, map) = many1(alt((
-        {parse_forest(input, point)},
-        parse_path(input, point),
-        parse_slope(input, point),
+        |i| parse_forest(i),
+        |i| parse_path(i),
+        |i| parse_slope(i),
     )))(input)?;
-
-
     Ok((input, map))
 }
 
 
-fn parse(input: &str) -> IResult<&str, Vec<Vec<LegendMap>>> {
-    let mut initial_point = Point { x: 0, y: 0 };
-    let (_, maps) = separated_list1(newline, |i| parse_map(i, &mut initial_point))(input)?;
-    dbg!(maps);
+fn parse(input: Span) -> IResult<Span, Vec<Vec<LegendMap>>> {
+    let (input, maps) = separated_list1(newline, |i| parse_map(i))(input)?;
     todo!();
 }
 
 //--------------------------------------------------
 
 fn part_1(inp:String)->usize{
-    let (_,all_mapping) = parse(&inp).unwrap();
-    dbg!(all_mapping);
+    let span = Span::new(&inp);
+
+    parse(span).unwrap();
     2
 }
 
-fn part_2(_input:String)->usize{
+fn part_2(input:String)->usize{
  todo!()   
 }   
 
